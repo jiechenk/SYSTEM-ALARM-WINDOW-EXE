@@ -1,0 +1,11 @@
+{
+  "globalVolume": 70,
+  "court1": {
+    "alarmAudio": "",
+    "warningAudio": "",
+    "warningTime": 5
+  },
+  "court2": {},
+  "court3": {},
+  "court4": {}
+}

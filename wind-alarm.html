@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM ALARM </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .courts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .court-card {
+            background: #83edf2;
+            border-radius: 35px;
+            padding: 11px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .court-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .court-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: -27px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #616679;
+        }
+
+        .court-title {
+            font-size: 1.5em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-occupied {
+            background: #ef4444;
+            color: white;
+        }
+
+        .timer-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .timer-time {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-label {
+            color: #020202;
+            margin-top: -17px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-start {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #059669;
+        }
+
+        .btn-pause {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background: #d97706;
+        }
+
+        .btn-stop {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #dc2626;
+        }
+
+        .btn-reset {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #4b5563;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .alarm-warning {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #92400e;
+            display: none;
+        }
+
+        .alarm-warning.active {
+            display: block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .controls-panel {
+            background: white;
+            border-radius: 35px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 9px;
+        }
+
+        .controls-title {
+            font-size: 1.3em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .volume-control input[type="range"] {
+            flex: 1;
+            height: 8px;
+        }
+
+        .volume-label {
+            color: #666;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .audio-upload {
+            margin: 15px 0;
+            padding: 3px;
+            background: #76ccd0cc;
+            border-radius: 14px;
+        }
+
+        .audio-upload label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .audio-upload input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .audio-upload input[type="file"]::-webkit-file-upload-button {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .audio-upload input[type="file"]::-webkit-file-upload-button:hover {
+            background: #5568d3;
+        }
+
+        .audio-info {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #10b981;
+            display: none;
+        }
+
+        .audio-info.active {
+            display: block;
+        }
+
+        .btn-test {
+            background: #1b1722e0;
+            color: white;
+            margin-top: 6px;
+            width: 100%;
+        }
+
+        .btn-test:hover {
+            background: #7c3aed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SYSTEM ALARM LAPANGAN </h1>
+        
+        <div class="controls-panel">
+            <div class="controls-title">Pengaturan Global</div>
+            <div class="volume-control">
+                <span class="volume-label">🔊 Volume Alarm:</span>
+                <input type="range" id="globalVolume" min="0" max="100" value="70">
+                <span id="volumeValue">70%</span>
+            </div>
+        </div>
+
+        <div class="courts-grid" id="courtsContainer"></div>
+    </div>
+
+    <script> 
+	
+  class CourtTimer {
+    constructor(courtId, courtNumber) {
+      this.courtId = courtId;
+      this.courtNumber = courtNumber;
+      this.duration = 0;
+      this.remaining = 0;
+      this.interval = null;
+      this.isPaused = false;
+      this.audioContext = null;
+      this.customAudio = null;
+      this.customWarning = null;
+      this.warningPlayed = false;
+      this.initAudio();
+      this.loadSavedSettings();
+      this.render();
+    }
+
+    initAudio() {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    // ====== LOAD SETTINGS FROM FILE ======
+    async loadSavedSettings() {
+      try {
+        const settings = await window.electronAPI.readSettings();
+        const courtData = settings[this.courtId] || {};
+
+        // Alarm audio
+        if (courtData.alarmAudio) {
+          this.customAudio = new Audio(courtData.alarmAudio);
+          this.customAudio.load();
+          const infoEl = document.getElementById(`${this.courtId}-audio-info`);
+          infoEl.textContent = `✓ Audio tersimpan: ${courtData.alarmAudio.split('\\').pop()}`;
+          infoEl.classList.add('active');
+        }
+
+        // Warning audio
+        if (courtData.warningAudio) {
+          this.customWarning = new Audio(courtData.warningAudio);
+          this.customWarning.load();
+          const infoEl = document.getElementById(`${this.courtId}-warning-info`);
+          infoEl.textContent = `✓ Audio tersimpan: ${courtData.warningAudio.split('\\').pop()}`;
+          infoEl.classList.add('active');
+        }
+
+        // Warning time
+        if (courtData.warningTime) {
+          this.warningTime = parseInt(courtData.warningTime);
+          const timeEl = document.getElementById(`${this.courtId}-warning-time`);
+          if (timeEl) timeEl.value = this.warningTime;
+        }
+
+      } catch (err) {
+        console.error('Gagal memuat settings:', err);
+      }
+    }
+
+    // ====== SAVE TO SETTINGS FILE ======
+    async saveToSettings(field, value) {
+      const settings = await window.electronAPI.readSettings();
+      if (!settings[this.courtId]) settings[this.courtId] = {};
+      settings[this.courtId][field] = value;
+      await window.electronAPI.writeSettings(settings);
+    }
+
+    async handleAudioUpload(type) {
+      const filePath = await window.electronAPI.selectAudioFile();
+      if (!filePath) return;
+
+      if (type === 'alarm') {
+        this.customAudio = new Audio(filePath);
+        this.customAudio.load();
+        await this.saveToSettings('alarmAudio', filePath);
+        const infoEl = document.getElementById(`${this.courtId}-audio-info`);
+        infoEl.textContent = `✓ Audio dimuat: ${filePath.split('\\').pop()}`;
+        infoEl.classList.add('active');
+      } else if (type === 'warning') {
+        this.customWarning = new Audio(filePath);
+        this.customWarning.load();
+        await this.saveToSettings('warningAudio', filePath);
+        const infoEl = document.getElementById(`${this.courtId}-warning-info`);
+        infoEl.textContent = `✓ Audio dimuat: ${filePath.split('\\').pop()}`;
+        infoEl.classList.add('active');
+      }
+    }
+
+    async handleWarningTimeChange(value) {
+      const time = parseInt(value);
+      if (time > 0) {
+        await this.saveToSettings('warningTime', time);
+      }
+    }
+
+    playAlarm() {
+      const volume = document.getElementById('globalVolume').value / 100;
+      if (this.customAudio) {
+        this.customAudio.volume = volume;
+        this.customAudio.currentTime = 0;
+        this.customAudio.play().catch(() => this.playDefaultBeep(volume));
+      } else {
+        this.playDefaultBeep(volume);
+      }
+    }
+
+    playWarning() {
+      const volume = document.getElementById('globalVolume').value / 100;
+      if (this.customWarning) {
+        this.customWarning.volume = volume;
+        this.customWarning.currentTime = 0;
+        this.customWarning.play().catch(() => this.playDefaultWarningBeep(volume));
+      } else {
+        this.playDefaultWarningBeep(volume);
+      }
+    }
+
+    playDefaultWarningBeep(volume) {
+      for (let i = 0; i < 2; i++) {
+        setTimeout(() => this.playBeep(600, 0.2, volume), i * 300);
+      }
+    }
+
+    playDefaultBeep(volume) {
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => this.playBeep(800, 0.3, volume), i * 400);
+      }
+    }
+
+    playBeep(frequency, duration, volume) {
+      const osc = this.audioContext.createOscillator();
+      const gain = this.audioContext.createGain();
+      osc.connect(gain);
+      gain.connect(this.audioContext.destination);
+      osc.frequency.value = frequency;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(volume, this.audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+      osc.start(this.audioContext.currentTime);
+      osc.stop(this.audioContext.currentTime + duration);
+    }
+
+    testAlarm() { this.playAlarm(); }
+    testWarning() { this.playWarning(); }
+
+    render() {
+      const container = document.getElementById('courtsContainer');
+      const courtDiv = document.createElement('div');
+      courtDiv.className = 'court-card';
+      courtDiv.id = this.courtId;
+
+      courtDiv.innerHTML = `
+        <div class="court-header">
+          <div class="court-title">Lapangan ${this.courtNumber}</div>
+          <div class="status-badge status-available" id="${this.courtId}-status">Tersedia</div>
+        </div>
+
+        <div class="timer-display">
+          <div class="timer-time" id="${this.courtId}-time">00:00:00</div>
+          <div class="timer-label">Sisa Waktu</div>
+        </div>
+
+        <div class="input-group">
+          <label for="${this.courtId}-duration">Durasi (menit):</label>
+          <input type="number" id="${this.courtId}-duration" min="1" max="300" value="60">
+        </div>
+
+        <div class="input-group">
+          <label for="${this.courtId}-player">Nama Pemain:</label>
+          <input type="text" id="${this.courtId}-player">
+        </div>
+
+        <div class="audio-upload">
+          <label>🔊 Pilih Audio Alarm:</label>
+          <button class="btn-test" onclick="courts['${this.courtId}'].handleAudioUpload('alarm')">Pilih File</button>
+          <div class="audio-info" id="${this.courtId}-audio-info"></div>
+          <button class="btn-test" onclick="courts['${this.courtId}'].testAlarm()">🔔 Test Audio Alarm</button>
+        </div>
+
+        <div class="audio-upload">
+          <label>⚠️ Pilih Audio Warning:</label>
+          <button class="btn-test" onclick="courts['${this.courtId}'].handleAudioUpload('warning')">Pilih File</button>
+          <div class="audio-info" id="${this.courtId}-warning-info"></div>
+          <div class="input-group" style="margin-top: 10px;">
+            <label>Waktu Warning (menit sebelum habis):</label>
+            <input type="number" id="${this.courtId}-warning-time" min="1" max="30" value="5"
+              onchange="courts['${this.courtId}'].handleWarningTimeChange(this.value)">
+          </div>
+          <button class="btn-test" onclick="courts['${this.courtId}'].testWarning()">⚠️ Test Audio Warning</button>
+        </div>
+
+        <div class="button-group">
+          <button class="btn-start" onclick="courts['${this.courtId}'].start()">Mulai</button>
+          <button class="btn-pause" onclick="courts['${this.courtId}'].pause()" disabled>Pause</button>
+          <button class="btn-stop" onclick="courts['${this.courtId}'].stop()" disabled>Stop</button>
+          <button class="btn-reset" onclick="courts['${this.courtId}'].reset()">Reset</button>
+        </div>
+
+        <div class="alarm-warning" id="${this.courtId}-alarm">
+          ⏰ WAKTU HABIS! Lapangan ${this.courtNumber}
+        </div>
+      `;
+
+      container.appendChild(courtDiv);
+    }
+
+    updateDisplay() {
+      const h = Math.floor(this.remaining / 3600);
+      const m = Math.floor((this.remaining % 3600) / 60);
+      const s = this.remaining % 60;
+      document.getElementById(`${this.courtId}-time`).textContent =
+        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    updateButtons(state) {
+      const start = document.querySelector(`#${this.courtId} .btn-start`);
+      const pause = document.querySelector(`#${this.courtId} .btn-pause`);
+      const stop = document.querySelector(`#${this.courtId} .btn-stop`);
+      if (state === 'running') {
+        start.disabled = true; pause.disabled = false; stop.disabled = false;
+      } else if (state === 'paused') {
+        pause.textContent = 'Lanjut';
+      } else {
+        start.disabled = false; pause.disabled = true; stop.disabled = true;
+        pause.textContent = 'Pause';
+      }
+    }
+
+    updateStatus(status) {
+      const el = document.getElementById(`${this.courtId}-status`);
+      if (status === 'occupied') {
+        el.textContent = 'Terpakai';
+        el.className = 'status-badge status-occupied';
+      } else {
+        el.textContent = 'Tersedia';
+        el.className = 'status-badge status-available';
+      }
+    }
+
+    start() {
+      if (this.interval) return;
+      if (this.remaining === 0) {
+        const dur = parseInt(document.getElementById(`${this.courtId}-duration`).value);
+        if (!dur || dur <= 0) { alert('Masukkan durasi valid'); return; }
+        this.remaining = dur * 60;
+      }
+      this.isPaused = false;
+      this.updateStatus('occupied');
+      this.updateButtons('running');
+      this.interval = setInterval(() => {
+        if (!this.isPaused) {
+          this.remaining--;
+          this.updateDisplay();
+          const warningTime = parseInt(document.getElementById(`${this.courtId}-warning-time`).value) * 60;
+          if (this.remaining === warningTime && !this.warningPlayed) {
+            this.playWarning();
+            this.warningPlayed = true;
+          }
+          if (this.remaining <= 0) this.timeUp();
+        }
+      }, 1000);
+    }
+
+    pause() {
+      this.isPaused = !this.isPaused;
+      this.updateButtons(this.isPaused ? 'paused' : 'running');
+    }
+
+    stop() {
+      clearInterval(this.interval);
+      this.interval = null;
+      this.remaining = 0;
+      this.isPaused = false;
+      this.warningPlayed = false;
+      this.updateDisplay();
+      this.updateStatus('available');
+      this.updateButtons('stopped');
+      document.getElementById(`${this.courtId}-alarm`).classList.remove('active');
+    }
+
+    reset() {
+      this.stop();
+      document.getElementById(`${this.courtId}-duration`).value = 60;
+      document.getElementById(`${this.courtId}-player`).value = '';
+    }
+
+    timeUp() {
+      clearInterval(this.interval);
+      this.interval = null;
+      this.remaining = 0;
+      this.updateDisplay();
+      this.updateButtons('stopped');
+      document.getElementById(`${this.courtId}-alarm`).classList.add('active');
+      this.playAlarm();
+      setTimeout(() => {
+        document.getElementById(`${this.courtId}-alarm`).classList.remove('active');
+        this.updateStatus('available');
+      }, 10000);
+    }
+  }
+
+  // ======== INISIASI LAPANGAN ========
+  const courts = {};
+  for (let i = 1; i <= 4; i++) {
+    const id = `court${i}`;
+    courts[id] = new CourtTimer(id, i);
+  }
+
+  document.getElementById('globalVolume').addEventListener('input', (e) => {
+    document.getElementById('volumeValue').textContent = e.target.value + '%';
+    window.electronAPI.readSettings().then(async (settings) => {
+      settings.globalVolume = e.target.value;
+      await window.electronAPI.writeSettings(settings);
+    });
+  });
+
+
+    </script>
+</body>
+</html>

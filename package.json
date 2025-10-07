@@ -1,0 +1,50 @@
+{
+  "name": "system-alarm-lapangan",
+  "version": "1.0.0",
+  "description": "Sistem alarm lapangan dengan dukungan audio dan penyimpanan lokal",
+  "main": "main.js",
+  "author": "Jie",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . Wind --platform=win32 --arch=x64 --icon=icon.ico --overwrite --out=dist",
+    "dist": "electron-builder build --win --x64"
+  },
+  "build": {
+    "appId": "com.jie.windalarm",
+    "productName": "System Alarm Lapangan",
+    "copyright": "© 2025 Jie",
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/.bin",
+      "!dist",
+      "!release"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "System Alarm Lapangan"
+    }
+  },
+  "devDependencies": {
+    "electron": "^38.2.1",
+    "electron-builder": "^25.1.8",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "path": "^0.12.7"
+  }
+}
